@@ -12,7 +12,7 @@ def get_args():
     parser = argparse.ArgumentParser(
         "EfficientDet: Scalable and Efficient Object Detection implementation by Signatrix GmbH")
     parser.add_argument("--image_size", type=int, default=512, help="The common width and height for all images")
-    parser.add_argument("--data_path", type=str, default="data/COCO", help="the root folder of dataset")
+    parser.add_argument("--data_path", type=str, default="data", help="the root folder of dataset")
     parser.add_argument("--cls_threshold", type=float, default=0.5)
     parser.add_argument("--nms_threshold", type=float, default=0.5)
     parser.add_argument("--pretrained_model", type=str, default="trained_models/signatrix_efficientdet_coco.pth")
@@ -25,7 +25,7 @@ def get_args():
 def test(opt):
     model = torch.load(opt.pretrained_model)
     model.cuda()
-    dataset = CocoDataset(opt.data_path, set='val2017', transform=transforms.Compose([Normalizer(), Resizer()]))
+    dataset = CocoDataset(opt.data_path, set='val', transform=transforms.Compose([Normalizer(), Resizer()]))
 
     if os.path.isdir(opt.output):
         shutil.rmtree(opt.output)
