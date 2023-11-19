@@ -16,11 +16,11 @@ def get_args():
     parser = argparse.ArgumentParser(
         "EfficientDet: Scalable and Efficient Object Detection implementation by Signatrix GmbH")
     parser.add_argument("--image_size", type=int, default=512, help="The common width and height for all images")
-    parser.add_argument("--batch_size", type=int, default=8, help="The number of images per batch")
+    parser.add_argument("--batch_size", type=int, default=4, help="The number of images per batch")
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument('--alpha', type=float, default=0.25)
     parser.add_argument('--gamma', type=float, default=1.5)
-    parser.add_argument("--num_epochs", type=int, default=500)
+    parser.add_argument("--num_epochs", type=int, default=20)
     parser.add_argument("--test_interval", type=int, default=1, help="Number of epoches between testing phases")
     parser.add_argument("--es_min_delta", type=float, default=0.0,
                         help="Early stopping's parameter: minimum change loss to qualify as an improvement")
@@ -46,13 +46,13 @@ def train(opt):
                        "shuffle": True,
                        "drop_last": True,
                        "collate_fn": collater,
-                       "num_workers": 12}
+                       "num_workers": 4}
 
     test_params = {"batch_size": opt.batch_size,
                    "shuffle": False,
                    "drop_last": False,
                    "collate_fn": collater,
-                   "num_workers": 12}
+                   "num_workers": 4}
 
     training_set = CocoDataset(root_dir=opt.data_path, set="train",
                                transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
@@ -97,6 +97,8 @@ def train(opt):
             try:
                 optimizer.zero_grad()
                 if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+
                     cls_loss, reg_loss = model([data['img'].cuda().float(), data['annot'].cuda()])
                 else:
                     cls_loss, reg_loss = model([data['img'].float(), data['annot']])
@@ -132,6 +134,8 @@ def train(opt):
             for iter, data in enumerate(test_generator):
                 with torch.no_grad():
                     if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+
                         cls_loss, reg_loss = model([data['img'].cuda().float(), data['annot'].cuda()])
                     else:
                         cls_loss, reg_loss = model([data['img'].float(), data['annot']])

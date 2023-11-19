@@ -5,7 +5,7 @@ import json
 import torch
 
 
-def evaluate_coco(dataset, model, threshold=0.05):
+def evaluate_coco(dataset, model, threshold=0.4):
     model.eval()
     with torch.no_grad():
         results = []
@@ -36,6 +36,7 @@ def evaluate_coco(dataset, model, threshold=0.05):
                         'score': float(score),
                         'bbox': box.tolist(),
                     }
+                    print(image_result)
 
                     results.append(image_result)
 
@@ -66,6 +67,6 @@ def evaluate_coco(dataset, model, threshold=0.05):
 if __name__ == '__main__':
     efficientdet = torch.load("trained_models/signatrix_efficientdet_coco.pth").module
     efficientdet.cuda()
-    dataset_val = CocoDataset("data/COCO", set='val2017',
+    dataset_val = CocoDataset("data", set='val',
                               transform=transforms.Compose([Normalizer(), Resizer()]))
     evaluate_coco(dataset_val, efficientdet)
