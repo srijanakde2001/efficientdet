@@ -26,7 +26,7 @@ def get_args():
                         help="Early stopping's parameter: minimum change loss to qualify as an improvement")
     parser.add_argument("--es_patience", type=int, default=0,
                         help="Early stopping's parameter: number of epochs with no improvement after which training will be stopped. Set to 0 to disable this technique.")
-    parser.add_argument("--data_path", type=str, default="data/COCO", help="the root folder of dataset")
+    parser.add_argument("--data_path", type=str, default="data", help="the root folder of dataset")
     parser.add_argument("--log_path", type=str, default="tensorboard/signatrix_efficientdet_coco")
     parser.add_argument("--saved_path", type=str, default="trained_models")
 
@@ -54,11 +54,11 @@ def train(opt):
                    "collate_fn": collater,
                    "num_workers": 12}
 
-    training_set = CocoDataset(root_dir=opt.data_path, set="train2017",
+    training_set = CocoDataset(root_dir=opt.data_path, set="train",
                                transform=transforms.Compose([Normalizer(), Augmenter(), Resizer()]))
     training_generator = DataLoader(training_set, **training_params)
 
-    test_set = CocoDataset(root_dir=opt.data_path, set="val2017",
+    test_set = CocoDataset(root_dir=opt.data_path, set="val",
                            transform=transforms.Compose([Normalizer(), Resizer()]))
     test_generator = DataLoader(test_set, **test_params)
 
